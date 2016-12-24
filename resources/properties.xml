@@ -3,6 +3,8 @@
 		<property id="display_logo_orientation" type="boolean">true</property>
 		<property id="display_compass" type="boolean">true</property>
 		<property id="map_declination" type="float">0.0</property>
+		<property id="return_start_location" type="boolean">false</property>
+		<property id="return_lap_location" type="boolean">false</property>
 		<property id="color_text_compass" type="number">0</property> 
 		<property id="color_text_north" type="number">0</property>
 		<property id="color_compass" type="number">0</property>
@@ -20,6 +22,12 @@
 		<setting propertyKey="@Properties.map_declination" title="@Strings.map_declination_title" prompt="@Strings.map_declination_title">
 			<settingConfig type="numeric" />
 		</setting>
+		<setting propertyKey="@Properties.return_start_location" title="@Strings.return_start_location_title" prompt="@Strings.return_start_location_title">
+			<settingConfig type="boolean" />
+		</setting>
+		<setting propertyKey="@Properties.return_lap_location" title="@Strings.return_lap_location_title" prompt="@Strings.return_lap_location_title">
+			<settingConfig type="boolean" />
+		</setting>  
 		<setting propertyKey="@Properties.color_text_compass" title="@Strings.color_text_compass_title" prompt="@Strings.color_text_compass_title">
 			<settingConfig type="list" >
 				<listEntry value="0">@Strings.color_default</listEntry>

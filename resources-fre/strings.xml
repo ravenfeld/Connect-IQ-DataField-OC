@@ -4,6 +4,8 @@
     <string id="display_logo_orientation_title">Afficher la flèche d'orientation</string>
     <string id="display_compass_title">Afficher la boussole</string>
     <string id="map_declination_title">Inclinaison de la carte</string>
+    <string id="return_start_location_title">Retourner au point de départ</string>
+    <string id="return_lap_location_title">Retourner au point d'intermédiaire</string>
     <string id="color_text_compass_title">Couleur du texte de la boussole</string>
 	<string id="color_text_north_title">Couleur du texte Nord</string>
 	<string id="color_compass_title">Couleur de la bousole</string>
