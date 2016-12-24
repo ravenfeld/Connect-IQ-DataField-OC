@@ -64,6 +64,9 @@ class OCDataFieldView extends Ui.DataField
 			}
 		}
         
+        var return_start_location = App.getApp().getProperty("return_start_location");
+		var return_lap_location = App.getApp().getProperty("return_lap_location");
+			
 		if( heading_rad != null) {
 			var map_declination =  App.getApp().getProperty("map_declination");
 			if (map_declination != null ) {	
@@ -73,32 +76,49 @@ class OCDataFieldView extends Ui.DataField
 			if( heading_rad < 0 ) {
 				heading_rad = 2*Math.PI+heading_rad;
 			}
-            
-            var display_logo_orientation = App.getApp().getProperty("display_logo_orientation");
-            if( display_logo_orientation ){
-				drawLogoOrientation(dc, center_x, center_y, size_max);
-			}
-				
+            				
 			var orientation = null;	
 			if( location_current !=null && location_lap != null ) {
-
-				var	latitude_lap = location_lap.toRadians()[0];
-				var	longitude_lap = location_lap.toRadians()[1];
+				var	latitude_point_start;
+				var	longitude_point_start;
+				var latitude_point_arrive;
+				var longitude_point_arrive;
 				
-				var latitude_current = location_current.toRadians()[0];
-				var longitude_current = location_current.toRadians()[1];
-    		
-				var distance = Math.acos(Math.sin(latitude_lap)*Math.sin(latitude_current) + Math.cos(latitude_lap)*Math.cos(latitude_current)*Math.cos(longitude_lap-longitude_current));
+				if( return_start_location || return_lap_location ){
+					latitude_point_arrive = location_lap.toRadians()[0];
+					longitude_point_arrive = location_lap.toRadians()[1];
+				
+					latitude_point_start = location_current.toRadians()[0];
+					longitude_point_start = location_current.toRadians()[1];
+				}else{
+					latitude_point_start = location_lap.toRadians()[0];
+					longitude_point_start = location_lap.toRadians()[1];
+				
+					latitude_point_arrive = location_current.toRadians()[0];
+					longitude_point_arrive = location_current.toRadians()[1];
+				}
+					
+				var distance = Math.acos(Math.sin(latitude_point_start)*Math.sin(latitude_point_arrive) + Math.cos(latitude_point_start)*Math.cos(latitude_point_arrive)*Math.cos(longitude_point_start-longitude_point_arrive));
     		
 				if( distance > 0) {
-					orientation = Math.acos((Math.sin(latitude_current)-Math.sin(latitude_lap)*Math.cos(distance))/(Math.sin(distance)*Math.cos(latitude_lap)));
+					orientation = Math.acos((Math.sin(latitude_point_arrive)-Math.sin(latitude_point_start)*Math.cos(distance))/(Math.sin(distance)*Math.cos(latitude_point_start)));
     		
-					if( Math.sin(longitude_current-longitude_lap) <= 0 ) {
+					if( Math.sin(longitude_point_arrive-longitude_point_start) <= 0 ) {
 						orientation = 2*Math.PI-orientation;
 					}
-					drawTextOrientation(dc, center_x, center_y, size_max, orientation);
 				}
 			}
+			
+			var display_logo_orientation = App.getApp().getProperty("display_logo_orientation");
+			
+            if( display_logo_orientation ){
+            	if( orientation != null && ( return_start_location || return_lap_location ) ){
+					drawLogoOrientation(dc, center_x, center_y, size_max, -orientation);
+				}else{
+					drawLogoOrientation(dc, center_x, center_y, size_max, heading_rad);
+				}
+			}
+			
 			if( orientation !=null ){
 				drawTextOrientation(dc, center_x, center_y, size_max, orientation);
 			}else{
@@ -123,8 +143,10 @@ class OCDataFieldView extends Ui.DataField
 	}
                 
 	function onTimerLap(){
-		distance_lap=distance_start;
-		location_lap=location_current;               
+		if( !App.getApp().getProperty("return_start_location") ) {
+			distance_lap=distance_start;
+			location_lap=location_current;
+		}               
 	}        
     
 	function drawTextDistance(dc, center_x, center_y, size, distance) {  
@@ -255,7 +277,7 @@ class OCDataFieldView extends Ui.DataField
 		}       
 	}
     
-	function drawLogoOrientation(dc, center_x, center_y, size){
+	function drawLogoOrientation(dc, center_x, center_y, size, orientation){
 		var color = getColor(App.getApp().getProperty("color_orientation_logo"), Graphics.COLOR_LT_GRAY);
 		var radius;
 		
@@ -269,12 +291,12 @@ class OCDataFieldView extends Ui.DataField
 		
 		dc.setColor(color, Graphics.COLOR_TRANSPARENT);
 	
-		var xy1 = pol2Cart(center_x, center_y, heading_rad, radius);
-		var xy2 = pol2Cart(center_x, center_y, heading_rad+135*Math.PI/180, radius);
-		var xy3 = pol2Cart(center_x, center_y, heading_rad+171*Math.PI/180, radius/2.5);
-		var xy4 = pol2Cart(center_x, center_y, heading_rad, radius/3);
-		var xy5 = pol2Cart(center_x, center_y, heading_rad+189*Math.PI/180, radius/2.5);
-		var xy6 = pol2Cart(center_x, center_y, heading_rad+225*Math.PI/180, radius);
+		var xy1 = pol2Cart(center_x, center_y, orientation, radius);
+		var xy2 = pol2Cart(center_x, center_y, orientation+135*Math.PI/180, radius);
+		var xy3 = pol2Cart(center_x, center_y, orientation+171*Math.PI/180, radius/2.5);
+		var xy4 = pol2Cart(center_x, center_y, orientation, radius/3);
+		var xy5 = pol2Cart(center_x, center_y, orientation+189*Math.PI/180, radius/2.5);
+		var xy6 = pol2Cart(center_x, center_y, orientation+225*Math.PI/180, radius);
 		dc.fillPolygon([xy1, xy2, xy3, xy4, xy5, xy6]);
 	}
     
