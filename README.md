@@ -1,7 +1,13 @@
 # Connect-IQ-DataField-OC
-When you have to find some place and you know distance and bearing to this place from current location using your map and compass, you press Lap button to mark current location as a reference and go to the place of interest until distance and bearing on the display is equal to the desired ones.
+Datafield for your Orientation Course
 
-Compass and arrow is always pointing to the real north.
+If you know the distance as well as the azimuth of your next tag you only have to appate on LAP to indicate your current location. You only have to match the distance and the angle that you have read on your card.
+
+You can change the settings to tell you the direction and distance back from either your starting point or your reference point indicated by pressing LAP
+
+Compass is always pointing to the real north.
+
+By default the arrow pointing to real north.
 
 ![0](https://github.com/ravenfeld/Connect-IQ-DataField-OC/blob/develop/screenshot/0.png)
 ![0](https://github.com/ravenfeld/Connect-IQ-DataField-OC/blob/develop/screenshot/1.png)
