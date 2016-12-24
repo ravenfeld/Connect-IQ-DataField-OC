@@ -6,6 +6,7 @@ If you know the distance as well as the azimuth of your next tag you only have t
 You can change the settings to tell you the direction and distance back from either your starting point or your reference point indicated by pressing LAP
 
 Compass is always pointing to the real north.
+
 By default the arrow pointing to real north.
 
 ![0](https://github.com/ravenfeld/Connect-IQ-DataField-OC/blob/develop/screenshot/0.png)
