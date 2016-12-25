@@ -239,13 +239,13 @@ class OCDataFieldView extends Ui.DataField
 		var font;
 		var penWidth = 0;
 		var step = 0;
-		var circle = false;
+		var detail = false;
 		
 		if( size >= SIZE_DATAFIELD_1 ) {
 			penWidth=8;
 			step=12;
 			font = Graphics.FONT_MEDIUM;
-			circle=true;
+			detail = true;
 		}else if( size >= SIZE_DATAFIELD_2 ) {
 			penWidth=6;
 			step=20;
@@ -272,9 +272,20 @@ class OCDataFieldView extends Ui.DataField
 		var endAngle = heading_rad*180/Math.PI + 90+ step;
        	dc.setColor(colorCompass, Graphics.COLOR_TRANSPARENT);
 		dc.setPenWidth(penWidth);
-		for ( var i = 0; i < 4; i++ ) {
+		for( var i = 0; i < 4; i++ ) {
 			dc.drawArc(center_x, center_y, radius, Gfx.ARC_CLOCKWISE, 90+startAngle-i*90, (360-90+endAngle.toLong()-i*90)%360 );
-		}       
+		}
+		
+		if( detail ) {
+			dc.setPenWidth(penWidth/4);
+			for( var i = 0; i < 12; i++) {
+				if( i % 3 != 0 ) {
+					var xy1 = pol2Cart(center_x, center_y, heading_rad+i*Math.PI/6, radius);
+					var xy2 = pol2Cart(center_x, center_y, heading_rad+i*Math.PI/6, radius-radius/10);
+					dc.drawLine(xy1[0],xy1[1],xy2[0],xy2[1]);
+				}
+			}  
+		}     
 	}
     
 	function drawLogoOrientation(dc, center_x, center_y, size, orientation){
