@@ -31,7 +31,9 @@ class OCDataFieldView extends Ui.DataField
 	}
     
 	function compute(info) {
-		heading_rad = info.currentHeading;
+		if( info.currentHeading != null ) {
+			heading_rad = info.currentHeading;
+		}
 		distance_start = info.elapsedDistance;
 		location_current = info.currentLocation;
 		location_lap = info.startLocation;
