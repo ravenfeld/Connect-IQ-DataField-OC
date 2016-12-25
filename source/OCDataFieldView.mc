@@ -158,6 +158,7 @@ class OCDataFieldView extends Ui.DataField
 		var display_metric = false;
 		var distanceStr;
 		var metricStr;
+		var step_text_metric = 0;
 		
 		if( size >= SIZE_DATAFIELD_1 ) {
 			fontDist = Graphics.FONT_NUMBER_HOT ;
@@ -178,6 +179,7 @@ class OCDataFieldView extends Ui.DataField
 				}else{
 					distanceStr=(distance/1000.0).format("%.2f");
 				}
+				step_text_metric = dc.getTextWidthInPixels("m", fontMetric)/2;
 			}else{
 				metricStr="m";
 				distanceStr=distance.format("%d");
@@ -195,16 +197,18 @@ class OCDataFieldView extends Ui.DataField
 			}else{
 				metricStr="ft";
 				distanceStr=(distance/3.042).format("%d");
+				step_text_metric = dc.getTextWidthInPixels("t", fontMetric)/2;
 			}
 		}
 		
-		var text_width = dc.getTextWidthInPixels(distanceStr, fontDist);
-		var text_height =dc.getFontHeight(fontDist);
+		var text_width_dist = dc.getTextWidthInPixels(distanceStr, fontDist);
+		var text_height_dist = dc.getFontHeight(fontDist);
+		
 		
 		dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(center_x, center_y+size/4-12, fontDist, distanceStr, Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
+		dc.drawText(center_x-step_text_metric, center_y+size/4-12, fontDist, distanceStr, Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
 		if( display_metric ){
-			dc.drawText(center_x+text_width/2, center_y+size/4-12+text_height/4+2, fontMetric, metricStr, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
+			dc.drawText(center_x+text_width_dist/2-step_text_metric, center_y+size/4-12+text_height_dist/4+2, fontMetric, metricStr, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
 		}
 	}
     
