@@ -306,9 +306,10 @@ class OCDataFieldView extends Ui.DataField
 	}
     
 	function pol2Cart(center_x, center_y, radian, radius) {
-		var x = radius * Math.sin(radian);
-		var y = radius * Math.cos(radian);
-		return [center_x - x, center_y - y];
+		var x = center_x - radius * Math.sin(radian);
+		var y = center_y - radius * Math.cos(radian);
+		 
+		return [Math.ceil(x), Math.ceil(y)];
 	}
      
    	function getColor(color_property, color_default){
