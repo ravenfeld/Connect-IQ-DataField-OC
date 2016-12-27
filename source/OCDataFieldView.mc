@@ -19,7 +19,10 @@ class OCDataFieldView extends Ui.DataField
     hidden var eastStr="";
     hidden var southStr="";
     hidden var westStr="";
-    
+    hidden var center_x;
+	hidden var center_y;
+	hidden var size_max;
+		
 	function initialize() {
 		isMetric = System.getDeviceSettings().distanceUnits == System.UNIT_METRIC;
 		northStr = Ui.loadResource(Rez.Strings.north);
@@ -39,10 +42,10 @@ class OCDataFieldView extends Ui.DataField
 		location_lap = info.startLocation;
 	}
     
-	function onUpdate(dc) {   
-		var center_x = dc.getWidth() / 2;
-		var center_y = dc.getHeight() / 2;
-		var size_max = dc.getWidth() > dc.getHeight() ? dc.getHeight() : dc.getWidth();
+    function onLayout(dc) {
+    	center_x = dc.getWidth() / 2;
+		center_y = dc.getHeight() / 2;
+		size_max = dc.getWidth() > dc.getHeight() ? dc.getHeight() : dc.getWidth();
 		
 		var flag = getObscurityFlags();
 		if( flag == OBSCURE_BOTTOM|OBSCURE_RIGHT
@@ -65,7 +68,9 @@ class OCDataFieldView extends Ui.DataField
 				center_x = center_x+10;
 			}
 		}
-        
+    }
+    
+	function onUpdate(dc) {           
         var return_start_location = App.getApp().getProperty("return_start_location");
 		var return_lap_location = App.getApp().getProperty("return_lap_location");
 			
