@@ -184,7 +184,9 @@ class OCDataFieldView extends Ui.DataField
 				}else{
 					distanceStr=(distance/1000.0).format("%.2f");
 				}
-				step_text_metric = dc.getTextWidthInPixels("m", fontMetric)/2;
+				if( display_metric ){
+					step_text_metric = dc.getTextWidthInPixels("m", fontMetric)/2;
+				}
 			}else{
 				metricStr="m";
 				distanceStr=distance.format("%d");
@@ -202,7 +204,9 @@ class OCDataFieldView extends Ui.DataField
 			}else{
 				metricStr="ft";
 				distanceStr=(distance/3.042).format("%d");
-				step_text_metric = dc.getTextWidthInPixels("t", fontMetric)/2;
+				if( display_metric ){
+					step_text_metric = dc.getTextWidthInPixels("t", fontMetric)/2;
+				}
 			}
 		}
 		
