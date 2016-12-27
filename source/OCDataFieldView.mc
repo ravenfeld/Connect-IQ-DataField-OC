@@ -19,7 +19,10 @@ class OCDataFieldView extends Ui.DataField
     hidden var eastStr="";
     hidden var southStr="";
     hidden var westStr="";
-    
+    hidden var center_x;
+	hidden var center_y;
+	hidden var size_max;
+		
 	function initialize() {
 		isMetric = System.getDeviceSettings().distanceUnits == System.UNIT_METRIC;
 		northStr = Ui.loadResource(Rez.Strings.north);
@@ -31,16 +34,18 @@ class OCDataFieldView extends Ui.DataField
 	}
     
 	function compute(info) {
-		heading_rad = info.currentHeading;
+		if( info.currentHeading != null ) {
+			heading_rad = info.currentHeading;
+		}
 		distance_start = info.elapsedDistance;
 		location_current = info.currentLocation;
 		location_lap = info.startLocation;
 	}
     
-	function onUpdate(dc) {   
-		var center_x = dc.getWidth() / 2;
-		var center_y = dc.getHeight() / 2;
-		var size_max = dc.getWidth() > dc.getHeight() ? dc.getHeight() : dc.getWidth();
+    function onLayout(dc) {
+    	center_x = dc.getWidth() / 2;
+		center_y = dc.getHeight() / 2;
+		size_max = dc.getWidth() > dc.getHeight() ? dc.getHeight() : dc.getWidth();
 		
 		var flag = getObscurityFlags();
 		if( flag == OBSCURE_BOTTOM|OBSCURE_RIGHT
@@ -63,7 +68,9 @@ class OCDataFieldView extends Ui.DataField
 				center_x = center_x+10;
 			}
 		}
-        
+    }
+    
+	function onUpdate(dc) {           
         var return_start_location = App.getApp().getProperty("return_start_location");
 		var return_lap_location = App.getApp().getProperty("return_lap_location");
 			
@@ -156,6 +163,7 @@ class OCDataFieldView extends Ui.DataField
 		var display_metric = false;
 		var distanceStr;
 		var metricStr;
+		var step_text_metric = 0;
 		
 		if( size >= SIZE_DATAFIELD_1 ) {
 			fontDist = Graphics.FONT_NUMBER_HOT ;
@@ -176,6 +184,9 @@ class OCDataFieldView extends Ui.DataField
 				}else{
 					distanceStr=(distance/1000.0).format("%.2f");
 				}
+				if( display_metric ){
+					step_text_metric = dc.getTextWidthInPixels("m", fontMetric)/2;
+				}
 			}else{
 				metricStr="m";
 				distanceStr=distance.format("%d");
@@ -193,16 +204,20 @@ class OCDataFieldView extends Ui.DataField
 			}else{
 				metricStr="ft";
 				distanceStr=(distance/3.042).format("%d");
+				if( display_metric ){
+					step_text_metric = dc.getTextWidthInPixels("t", fontMetric)/2;
+				}
 			}
 		}
 		
-		var text_width = dc.getTextWidthInPixels(distanceStr, fontDist);
-		var text_height =dc.getFontHeight(fontDist);
+		var text_width_dist = dc.getTextWidthInPixels(distanceStr, fontDist);
+		var text_height_dist = dc.getFontHeight(fontDist);
+		
 		
 		dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(center_x, center_y+size/4-12, fontDist, distanceStr, Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
+		dc.drawText(center_x-step_text_metric, center_y+size/4-12, fontDist, distanceStr, Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
 		if( display_metric ){
-			dc.drawText(center_x+text_width/2, center_y+size/4-12+text_height/4+2, fontMetric, metricStr, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
+			dc.drawText(center_x+text_width_dist/2-step_text_metric, center_y+size/4-12+text_height_dist/4+2, fontMetric, metricStr, Graphics.TEXT_JUSTIFY_LEFT|Graphics.TEXT_JUSTIFY_VCENTER);
 		}
 	}
     
@@ -239,13 +254,13 @@ class OCDataFieldView extends Ui.DataField
 		var font;
 		var penWidth = 0;
 		var step = 0;
-		var circle = false;
+		var detail = false;
 		
 		if( size >= SIZE_DATAFIELD_1 ) {
 			penWidth=8;
 			step=12;
 			font = Graphics.FONT_MEDIUM;
-			circle=true;
+			detail = true;
 		}else if( size >= SIZE_DATAFIELD_2 ) {
 			penWidth=6;
 			step=20;
@@ -272,9 +287,20 @@ class OCDataFieldView extends Ui.DataField
 		var endAngle = heading_rad*180/Math.PI + 90+ step;
        	dc.setColor(colorCompass, Graphics.COLOR_TRANSPARENT);
 		dc.setPenWidth(penWidth);
-		for ( var i = 0; i < 4; i++ ) {
+		for( var i = 0; i < 4; i++ ) {
 			dc.drawArc(center_x, center_y, radius, Gfx.ARC_CLOCKWISE, 90+startAngle-i*90, (360-90+endAngle.toLong()-i*90)%360 );
-		}       
+		}
+		
+		if( detail ) {
+			dc.setPenWidth(penWidth/4);
+			for( var i = 0; i < 12; i++) {
+				if( i % 3 != 0 ) {
+					var xy1 = pol2Cart(center_x, center_y, heading_rad+i*Math.PI/6, radius);
+					var xy2 = pol2Cart(center_x, center_y, heading_rad+i*Math.PI/6, radius-radius/10);
+					dc.drawLine(xy1[0],xy1[1],xy2[0],xy2[1]);
+				}
+			}  
+		}     
 	}
     
 	function drawLogoOrientation(dc, center_x, center_y, size, orientation){
@@ -306,9 +332,10 @@ class OCDataFieldView extends Ui.DataField
 	}
     
 	function pol2Cart(center_x, center_y, radian, radius) {
-		var x = radius * Math.sin(radian);
-		var y = radius * Math.cos(radian);
-		return [center_x - x, center_y - y];
+		var x = center_x - radius * Math.sin(radian);
+		var y = center_y - radius * Math.cos(radian);
+		 
+		return [Math.ceil(x), Math.ceil(y)];
 	}
      
    	function getColor(color_property, color_default){
