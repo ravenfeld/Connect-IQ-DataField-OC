@@ -21,6 +21,7 @@ class OCDataFieldView extends Ui.DataField
     hidden var center_x;
 	hidden var center_y;
 	hidden var size_max;
+	hidden var timer;
 		
 	function initialize() {
 		isMetric = System.getDeviceSettings().distanceUnits == System.UNIT_METRIC;
@@ -40,6 +41,7 @@ class OCDataFieldView extends Ui.DataField
 		if( App.getApp().getProperty("return_start_location") ) {
 			location_lap = info.startLocation;
 		}
+		timer = info.timerTime;
 	}
     
     function onLayout(dc) {
@@ -129,32 +131,56 @@ class OCDataFieldView extends Ui.DataField
 			
 			var display_text_orientation = App.getApp().getProperty("display_text_orientation");
 			var display_text_distance = App.getApp().getProperty("display_text_distance");
+			var display_text_time = App.getApp().getProperty("display_text_timer");
 			
 			if( display_text_orientation ){
 				var y = center_y ;
-				if( display_text_distance && distance != null && distance > 0) {
+				var size = size_max;
+				if( (display_text_distance && distance != null && distance > 0 ) && (display_text_time  && timer > 0)){
+					y = center_y - size_max/4;
+					size = size_max/1.5;
+				}else if( (display_text_distance && distance != null && distance > 0) || (display_text_time  && timer > 0)) {
 					y = center_y - size_max/4+12;
 				}
 			
 				if( orientation !=null ){
 					if( return_start_location || return_lap_location  ){
-						drawTextOrientation(dc, center_x, y, size_max, orientation-heading_rad);
+						drawTextOrientation(dc, center_x, y, size, orientation-heading_rad);
 					}else{
-						drawTextOrientation(dc, center_x, y, size_max, orientation);
+						drawTextOrientation(dc, center_x, y, size, orientation);
 					}
 				}else{
-					drawTextOrientation(dc, center_x, y, size_max, heading_rad);
+					drawTextOrientation(dc, center_x, y, size, heading_rad);
 				}
 			}
 			
 			if( display_text_distance && distance != null && distance > 0 ){
 				var y = center_y ;
-				if( display_text_orientation ) {
+				
+				var size = size_max;
+				if( display_text_orientation && (display_text_time && timer > 0) ) {
+					y = center_y + 4;
+					size = size_max/1.5;
+				}else if( display_text_orientation ){
 					y = center_y + size_max/4-12;
-				}  
-				drawTextDistance(dc, center_x, y, size_max, distance*RAY_EARTH);
+				}else if( display_text_time && timer > 0 ){
+					y = center_y - size_max/4+12;
+				}
+				drawTextDistance(dc, center_x, y, size, distance*RAY_EARTH);
 			}
 
+			if( display_text_time  && timer > 0){
+				var y = center_y ;
+				var size = size_max;
+				if( display_text_orientation && ( display_text_distance && distance != null && distance > 0) ){
+					y = center_y + size_max/4-2;
+					size = size_max/1.5;
+				}else if(  display_text_orientation || ( display_text_distance && distance != null && distance > 0)){
+					y = center_y + size_max/4-12;
+				}
+				drawTextTime(dc, center_x, y, size, timer);
+			}
+			
 			var display_compass = App.getApp().getProperty("display_compass");
 			if( display_compass ){
 				drawCompass(dc, center_x, center_y, size_max);
@@ -186,7 +212,10 @@ class OCDataFieldView extends Ui.DataField
 		if( size >= SIZE_DATAFIELD_1 ) {
 			fontDist = Graphics.FONT_NUMBER_HOT ;
 			display_metric=true;
-		}else if( size >= SIZE_DATAFIELD_2 ){
+		}else if( size > SIZE_DATAFIELD_2 ){
+			fontDist = Graphics.FONT_NUMBER_MEDIUM ;
+			display_metric=true;
+		}else if( size == SIZE_DATAFIELD_2 ){
 			fontDist = Graphics.FONT_NUMBER_MILD ;
 		}else{
 			fontDist = Graphics.FONT_XTINY;
@@ -253,7 +282,10 @@ class OCDataFieldView extends Ui.DataField
 		if(size >= SIZE_DATAFIELD_1) {
 			fontOrientaion = Graphics.FONT_NUMBER_THAI_HOT ;
 			display_metric=true;
-		}else if( size >= SIZE_DATAFIELD_2 ) {
+		}else if( size > SIZE_DATAFIELD_2 ){
+			fontOrientaion = Graphics.FONT_NUMBER_HOT ;
+			display_metric=true;
+		}else if( size == SIZE_DATAFIELD_2 ) {
 			fontOrientaion = Graphics.FONT_NUMBER_MILD ;
 		}else{
 			fontOrientaion = Graphics.FONT_XTINY;
@@ -267,7 +299,34 @@ class OCDataFieldView extends Ui.DataField
 			dc.drawText(center_x+text_width/2+2, center_y-text_height/4+2, fontMetric, "o", Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
 		}
 	}
-        
+     
+    function drawTextTime(dc, center_x, center_y, size, millis){
+		var color = getColor(App.getApp().getProperty("color_text_timer"), getTextColor());
+		var fontTime;
+		var fontMetric = Graphics.FONT_TINY;
+		var second = (millis / 1000) % 60;
+		var minute = (millis / (1000 * 60)) % 60;
+		var hour = (millis / (1000 * 60 * 60)) % 24;
+		var timeStr = minute.format("%02d")+":"+second.format("%02d");
+		
+		if( hour > 0 ){
+			timerStr = hour.format("%02d")+":"+minute.format("%02d")+":"+second.format("%02d");
+		}
+
+		if(size >= SIZE_DATAFIELD_1) {
+			fontTime = Graphics.FONT_NUMBER_HOT ;
+		}else if(size > SIZE_DATAFIELD_2){
+			fontTime = Graphics.FONT_NUMBER_MEDIUM ;
+		}else if( size == SIZE_DATAFIELD_2 ) {
+			fontTime = Graphics.FONT_NUMBER_MILD ;
+		}else{
+			fontTime = Graphics.FONT_XTINY;
+		}
+		
+		dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+		dc.drawText(center_x, center_y, fontTime, timeStr, Graphics.TEXT_JUSTIFY_CENTER|Graphics.TEXT_JUSTIFY_VCENTER);
+	}
+	   
 	function drawCompass(dc, center_x, center_y, size) {
 		var colorText = getColor(App.getApp().getProperty("color_text_compass"), getTextColor());
 		var colorTextNorth = getColor(App.getApp().getProperty("color_text_north"), getTextColor());
