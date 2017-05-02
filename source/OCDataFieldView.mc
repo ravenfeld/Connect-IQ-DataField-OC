@@ -186,7 +186,10 @@ class OCDataFieldView extends Ui.DataField
 		if( size >= SIZE_DATAFIELD_1 ) {
 			fontDist = Graphics.FONT_NUMBER_HOT ;
 			display_metric=true;
-		}else if( size >= SIZE_DATAFIELD_2 ){
+		}else if( size > SIZE_DATAFIELD_2 ){
+			fontDist = Graphics.FONT_NUMBER_MEDIUM ;
+			display_metric=true;
+		}else if( size == SIZE_DATAFIELD_2 ){
 			fontDist = Graphics.FONT_NUMBER_MILD ;
 		}else{
 			fontDist = Graphics.FONT_XTINY;
@@ -253,7 +256,10 @@ class OCDataFieldView extends Ui.DataField
 		if(size >= SIZE_DATAFIELD_1) {
 			fontOrientaion = Graphics.FONT_NUMBER_THAI_HOT ;
 			display_metric=true;
-		}else if( size >= SIZE_DATAFIELD_2 ) {
+		}else if( size > SIZE_DATAFIELD_2 ){
+			fontOrientaion = Graphics.FONT_NUMBER_HOT ;
+			display_metric=true;
+		}else if( size == SIZE_DATAFIELD_2 ) {
 			fontOrientaion = Graphics.FONT_NUMBER_MILD ;
 		}else{
 			fontOrientaion = Graphics.FONT_XTINY;
