@@ -22,6 +22,7 @@ class OCDataFieldView extends Ui.DataField
 	hidden var center_y;
 	hidden var size_max;
 	hidden var timer;
+	hidden var timer_lap=0;
 		
 	function initialize() {
 		isMetric = System.getDeviceSettings().distanceUnits == System.UNIT_METRIC;
@@ -181,7 +182,7 @@ class OCDataFieldView extends Ui.DataField
 				}else if(  display_text_orientation || ( display_text_distance && distance != null && distance > 0)){
 					y = center_y + size_max/4-12;
 				}
-				drawTextTime(dc, center_x, y, size, timer);
+				drawTextTime(dc, center_x, y, size, timer-timer_lap);
 			}
 			
 			var display_compass = App.getApp().getProperty("display_compass");
@@ -200,6 +201,7 @@ class OCDataFieldView extends Ui.DataField
 	function onTimerLap(){
 		if( !App.getApp().getProperty("return_start_location") ) {
 			location_lap=location_current;
+			timer_lap = timer;
 		}               
 	}        
     
@@ -313,7 +315,7 @@ class OCDataFieldView extends Ui.DataField
 		var timeStr = minute.format("%02d")+":"+second.format("%02d");
 		
 		if( hour > 0 ){
-			timerStr = hour.format("%02d")+":"+minute.format("%02d")+":"+second.format("%02d");
+			timeStr = hour.format("%02d")+":"+minute.format("%02d")+":"+second.format("%02d");
 		}
 
 		if(size >= SIZE_DATAFIELD_1) {
